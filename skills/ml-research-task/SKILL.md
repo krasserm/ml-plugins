@@ -132,16 +132,21 @@ columns, rows per split, sample rows. Surface class imbalance, missing values,
 unexpected formats, outliers, duplicates. Looking at data is the best way to
 boost performance and avoid failed jobs.
 
-## Monitoring (Trackio) — v1 is local
+## Monitoring — v1 is local, default to TensorBoard
 
-Trackio integrates natively with Transformers/TRL trainers. For new scripts,
-prefer `report_to="trackio"` with a descriptive `run_name` and `project`. In
-this v1 scaffold, **tracing is local** (no remote dashboard Space is seeded), so
-local `tensorboard` or local trackio is fine. Use `trackio.alert(title, text,
-level)` at decision points (ERROR=stop/change, WARN=tweak, INFO=milestone) with
-numeric values and an actionable suggestion, and read alerts back between runs
-to drive the next config (diverged→lr×0.1, overfitting→weight_decay×10 or less
-capacity, early-stopping→lr×0.5, high-accuracy→refine).
+Default to `report_to="tensorboard"` (tracing is local in v1; no Space is
+seeded) plus grep-able stdout logging (`disable_tqdm=True`,
+`logging_strategy="steps"`, `logging_first_step=True`) — the stdout loss lines
+are your primary signal via `hf_jobs.py logs`.
+
+**Do NOT combine `report_to="trackio"` with `push_to_hub=True`:** on push,
+Trackio's `on_push_begin` serializes the run config to Parquet, which crashes on
+a PEFT/LoRA model's empty `rank_pattern` struct (`ArrowNotImplementedError`)
+*after* training but *before* upload — losing the model. TensorBoard avoids this.
+
+Drive the next config from metrics read back between runs: diverged→lr×0.1,
+overfitting→weight_decay×10 or less capacity, early-stopping→lr×0.5,
+high-accuracy→refine.
 
 ## Running on HF Jobs
 
@@ -156,7 +161,7 @@ Before any GPU job, output this pre-flight block and fill every line:
 - Smoke test: [local 1-step run, or a `MAX_STEPS=5` HF Jobs smoke, and result]
 - `push_to_hub=True` and `hub_model_id` set
 - `--timeout`: [value] (based on [model size] on [hardware])
-- Monitoring included (local tensorboard/trackio for v1)
+- Monitoring included (local TensorBoard for v1; not Trackio when pushing — see Monitoring)
 
 If you can't fill every line, stop and complete the missing steps first. For
 batch/ablation jobs: submit ONE first, confirm it trains, then submit the rest.

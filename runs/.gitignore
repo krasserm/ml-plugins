@@ -1,0 +1,5 @@
+# Run artifacts (ledger.jsonl, summary.md, ...) are per-run outputs — keep the
+# directory in git but never the artifacts.
+*
+!.gitkeep
+!.gitignore

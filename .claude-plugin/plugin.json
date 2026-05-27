@@ -1,0 +1,6 @@
+{
+  "name": "ml-research",
+  "description": "A native Claude Code port of Hugging Face's ml-intern: autonomous ML engineering on the Hugging Face ecosystem with research-first fine-tuning (SFT/DPO/GRPO/LoRA) on HF Jobs, dataset/repo/paper tooling, and an optional budget-bounded autonomous experiment loop.",
+  "version": "0.1.0",
+  "author": { "name": "Martin Krasser" }
+}

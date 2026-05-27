@@ -1,0 +1,11 @@
+{
+  "name": "ml-plugins",
+  "owner": { "name": "Martin Krasser" },
+  "plugins": [
+    {
+      "name": "ml-research",
+      "source": "./",
+      "description": "A native Claude Code port of Hugging Face's ml-intern: autonomous ML engineering on the Hugging Face ecosystem."
+    }
+  ]
+}
